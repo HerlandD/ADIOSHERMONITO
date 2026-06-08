@@ -7,132 +7,145 @@
 </head>
 <style>
   body {
-  background-color: #0d0d0d;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  font-family: sans-serif;
-}
+    background-color: #0d0d0d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+  }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
 
-#btn-iniciar {
-  padding: 12px 24px;
-  background-color: #ff0055;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
-}
+  #btn-iniciar {
+    padding: 12px 24px;
+    background-color: #ff0055;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
+    transition: transform 0.2s;
+  }
 
-/* El contenedor define las dimensiones reales de tu video (por ejemplo, 16:9) */
-.contenedor {
-  width: 800px;           /* Ajusta el ancho que quieras para tu reproductor */
-  height: 450px;          /* Ajusta el alto proporcional */
-  display: flex;
-  overflow: hidden;       /* Oculta las persianas cuando están abajo */
-  border-radius: 12px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-  background-color: #000;
-}
+  #btn-iniciar:hover {
+    transform: scale(1.05);
+  }
 
-/* Cada una de las 4 columnas */
-.item {
-  width: 25%;             /* 4 columnas = 25% cada una */
-  height: 100%;
-  overflow: hidden;       /* ¡CRUCIAL! Recorta el exceso del video sin deformarlo */
-  position: relative;
-  
-  /* Animación de la persiana */
-  transform: translateY(100%); 
-  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-}
+  .contenedor {
+    width: 800px;           
+    height: 450px;          
+    display: flex;
+    overflow: hidden;       
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    background-color: #000;
+  }
 
-/* El truco maestro para que NO se deforme el video:
-   Cada video debe medir EXACTAMENTE lo mismo que el .contenedor principal,
-   sin importar que su columna padre (.item) sea más angosta. */
-.item video {
-  width: 800px;           /* DEBE SER IGUAL al width de .contenedor */
-  height: 450px;          /* DEBE SER IGUAL al height de .contenedor */
-  object-fit: cover;      /* Mantiene la proporción perfecta del juego */
-  position: absolute;
-  top: 0;
-}
+  .item {
+    width: 25%;             
+    height: 100%;
+    overflow: hidden;       
+    position: relative;
+    
+    /* Estado inicial: persianas cerradas (abajo) */
+    transform: translateY(100%); 
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
 
-/* Mover el video dentro de su máscara:
-  Como el video mide 800px pero la columna solo mide 200px, desplazamos el video 
-  hacia la izquierda en cada columna para que se alinee perfectamente.
-*/
-.img1 video { left: 0px; }          /* Primera columna: posición normal */
-.img2 video { left: -200px; }       /* Segunda columna: movido 1 ancho de columna (800 / 4) */
-.img3 video { left: -400px; }       /* Tercera columna: movido 2 anchos de columna */
-.img4 video { left: -600px; }       /* Cuarta columna: movido 3 anchos de columna */
+  .item video {
+    width: 800px;           
+    height: 450px;          
+    object-fit: cover;      
+    position: absolute;
+    top: 0;
+  }
 
+  .img1 video { left: 0px; }          
+  .img2 video { left: -200px; }       
+  .img3 video { left: -400px; }       
+  .img4 video { left: -600px; }       
 
-/* --- Efecto Hover y retrasos secuenciales --- */
-.contenedor:hover .item {
-  transform: translateY(0);
-}
+  /* CAMBIO CLAVE EN CSS: 
+    Quitamos el viejo .contenedor:hover y creamos una clase activa (.activo).
+    JavaScript se encargará de ponerla y quitarla.
+  */
+  .contenedor.activo .item {
+    transform: translateY(0);
+  }
 
-.contenedor:hover .img1 { transition-delay: 0s; }
-.contenedor:hover .img2 { transition-delay: 0.15s; }
-.contenedor:hover .img3 { transition-delay: 0.3s; }
-.contenedor:hover .img4 { transition-delay: 0.45s; }
+  /* Retrasos secuenciales controlados por la nueva clase */
+  .contenedor.activo .img1 { transition-delay: 0s; }
+  .contenedor.activo .img2 { transition-delay: 0.15s; }
+  .contenedor.activo .img3 { transition-delay: 0.3s; }
+  .contenedor.activo .img4 { transition-delay: 0.45s; }
 </style>
 <body>
   <div class="wrapper">
-  <button id="btn-iniciar">🔊 Activar Experiencia</button>
+    <button id="btn-iniciar">🔊 Activar Experiencia</button>
 
-  <div class="contenedor">
-    <div class="item img1">
-      <video id="video-principal" src="tu-video.mp4" loop playsinline></video>
-    </div>
-    
-    <div class="item img2">
-      <video class="video-espejo" src="tu-video.mp4" loop muted playsinline></video>
-    </div>
-    <div class="item img3">
-      <video class="video-espejo" src="tu-video.mp4" loop muted playsinline></video>
-    </div>
-    <div class="item img4">
-      <video class="video-espejo" src="tu-video.mp4" loop muted playsinline></video>
+    <div id="reproductor" class="contenedor">
+      <div class="item img1">
+        <video id="video-principal" src="tu-video.mp4" playsinline></video>
+      </div>
+      
+      <div class="item img2">
+        <video class="video-espejo" src="tu-video.mp4" muted playsinline></video>
+      </div>
+      <div class="item img3">
+        <video class="video-espejo" src="tu-video.mp4" muted playsinline></video>
+      </div>
+      <div class="item img4">
+        <video class="video-espejo" src="tu-video.mp4" muted playsinline></video>
+      </div>
     </div>
   </div>
-</div>
-</div>
 </body>
+
 <script>
-  document.getElementById('btn-iniciar').addEventListener('click', function() {
+  const boton = document.getElementById('btn-iniciar');
+  const reproductor = document.getElementById('reproductor'); // <-- La variable se llama 'reproductor'
   const videoPrincipal = document.getElementById('video-principal');
   const videosEspejo = document.querySelectorAll('.video-espejo');
-  
-  // Establecemos un volumen adecuado para el video principal
-  videoPrincipal.volume = 0.7; 
 
-  // Sincronizamos los tiempos de inicio de todos los videos por si acaso
-  const tiempoActual = videoPrincipal.currentTime;
-  
-  // Arrancamos el video principal con audio
-  videoPrincipal.play();
+  // 1. Evento al hacer clic en Activar Experiencia
+  boton.addEventListener('click', function() {
+    videoPrincipal.volume = 0.7; 
+    const tiempoActual = videoPrincipal.currentTime;
+    
+    // Reproducir todos los videos en sincronía
+    videoPrincipal.play();
+    videosEspejo.forEach(video => {
+      video.currentTime = tiempoActual;
+      video.play();
+    });
 
-  // Arrancamos los videos secundarios en perfecta sincronía mudos
-  videosEspejo.forEach(video => {
-    video.currentTime = tiempoActual;
-    video.play();
+    // CORREGIDO: Ahora usamos el nombre correcto de la variable 'reproductor'
+    reproductor.classList.add('activo');
+
+    // Desvanecer el botón de forma limpia
+    this.style.opacity = '0';
+    setTimeout(() => this.style.display = 'none', 300);
   });
 
-  // Ocultamos el botón con una transición suave o directamente
-  this.style.display = 'none';
-});
+  // 2. Evento para cuando el video termine (ended)
+  videoPrincipal.addEventListener('ended', function() {
+    // CORREGIDO: También cambiamos 'reproducir' por 'reproductor' aquí
+    reproductor.classList.remove('activo');
+
+    // Volver a mostrar el botón por si quieren repetir la experiencia
+    setTimeout(() => {
+      boton.style.display = 'block';
+      setTimeout(() => boton.style.opacity = '1', 50);
+    }, 1000); 
+  });
 </script>
 </html>
